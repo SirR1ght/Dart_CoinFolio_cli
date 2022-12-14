@@ -1,0 +1,15 @@
+# Lib files
+*.a
+*.lib
+
+# Executables
+*.out
+
+# Debug files
+*.dSYM/
+
+# Object files
+*.o
+
+# OS files
+*.DS_Store
