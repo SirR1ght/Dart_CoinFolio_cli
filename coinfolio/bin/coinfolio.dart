@@ -22,48 +22,44 @@ void print_intro() {
 		'******************************************************');
 }
 
-class Album {
-	final int userId;
-	final int id;
-	final String title;
+class Coin {
+	final String symbol;
+	final int price;
 
-	const Album({
-		required this.id,
-		required this.userId,
-		required this.title,
+	const Coin({
+		required this.symbol,
+		required this.price,
 	});
 
-	factory Album.fromJson(Map<String, dynamic> json) {
-		return Album(
-			userId: json['userId'],
-			id: json['id'],
-			title: json['title'],
-	);
+	factory Coin.fromJson(Map<String, dynamic> json) {
+		return Coin(
+			symbol: json['symbol'],
+			price: json['price'],
+		);
 	}
-
 	void printInfo() => print(this.toString());
 
 	String toString() {
-		return '${this.id} ${this.userId}, ${this.title}';
+		return "${this.symbol} ${this.price}";
 	}
 }
-// с
-List<String> symbs = ["BTCUSDT","BNBUSDT"];
 
-//сделать так что бы переменные листа были вставленны один за одним
 String urlGet(List<String> list) {
-	//TODO name it properly
 	if (list.length == 1) {
 		String preparedUrl = "$endpointPrice?symbol=${list[0]}";
 		return preparedUrl;
 	} else if (list.length > 1) {
-		//напечатать весь лист в строку
-		String preparedUrl = "$endpointPrice?symbols=";
-		for (list in )
+		String preparedUrl = "$endpointPrice?symbols=[";
+		for (final symbol in list) {
+			preparedUrl += "\"$symbol\",";
+		}
+		preparedUrl = preparedUrl.substring(0, preparedUrl.length - 1);
+		preparedUrl += "]";
 		return preparedUrl;
 	}
 	return endpointPrice;
 }
+
 
 bool requestAllowed(http.Response response){
 	if (response.statusCode == 429) {
@@ -74,96 +70,18 @@ bool requestAllowed(http.Response response){
 		// var banExpiration = DateTime.now().add(Duration(seconds: banDuration));
 		print("Your IP is banned until");
 		response.headers.forEach((key, value) => print('$key: $value'));
-
-	// 	}
+	} else if (response.statusCode == 200) {
+	  return true;
+	}
 }
 
-	response.headers.forEach((key, value) => print('$key: $value'));
-
-
-
-
 Future<void> fetchAlbum() async {
-
-	String symbol = 'BNBBUSD';
-	final url = '$endpointPrice?symbol=$symbol';
-	
-	// for (int i = 0; i < 40; i++) {
-
-	http.Request 
-
-
-	var request = http.Request('GET', Uri.parse(url));
-
-	var response = await http.get(Uri.parse(url));
-
-
-
-
-	var usedWeight = response.headers['x-mbx-used-weight'];
-		print(response.body);
-	// print('${i} = x-mbx-used-weight: $usedWeight, statusCode: ${response.statusCode}');
-	
-	if (response.statusCode == 429) {
-		// Handle the rate limit
-		print("Too many requests from your IP, backing off for ${response.headers['retry-after']} seconds");
-		response.headers.forEach((key, value) => print('$key: $value'));
-		// return false;
-	} else if (response.statusCode == 418) {
-		// var banExpiration = DateTime.now().add(Duration(seconds: banDuration));
-		print("Your IP is banned until");
-		response.headers.forEach((key, value) => print('$key: $value'));
-
-	// 	}
-	//return false;
-	// }
-	}
-
-
-	// response.headers.forEach((key, value) => print('$key: $value'));
-	
-	
-
-	// bool requestAllowed(http.Response response) {
-
-	// 	if (response.statusCode == 429) {
-	// 	// Handle the rate limit
-	// 		print("Too many requests from your IP, backing off for ${response.headers['retry-after']} seconds");
-	// 		return false;
-	// 	} else if (response.statusCode == 418) {
-	// 		var banExpiration = DateTime.now().add(Duration(seconds: banDuration));
-	// 		print("Your IP is banned until $banExpiration");
-	// 		return false;
-	// }
-
-	
-	
-	// if (response.statusCode == 200) {
-	  return Album.fromJson(jsonDecode(response.body));
-	// } else {
-	//   throw Exception('Failed to load album');
-	// }
-// 	if (response.statusCode == 429) {
-//     // Handle the rate limit
-//     var retryAfter = int.parse(response.headers['retry-after']);
-//     print("Too many requests from IP $ip, backing off for $retryAfter seconds");
-//     return false;
-//   } else if (response.statusCode == 418) {
-//     // Handle IP ban
-//     var banDuration = int.parse(response.headers['x-mbx-ban-duration']);
-//     var banExpiration = DateTime.now().add(Duration(seconds: banDuration));
-//     bannedIps[ip] = banExpiration;
-//     print("IP $ip is banned until $banExpiration");
-//     return false;
-
+// 	var request = http.Request('GET', Uri.parse(url));
+// 	var response = await http.get(Uri.parse(url));
+}
 
 void main(List<String> arguments) async {
-//   print_intro();
-	fetchAlbum();
 	// Album album = await fetchAlbum();
 	// fetchAlbum().then((value) => {value.printInfo()});
-	// album.printInfo();
-
-
-
+// response.headers.forEach((key, value) => print('$key: $value'));
 }
