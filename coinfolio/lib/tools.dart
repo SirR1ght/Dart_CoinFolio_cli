@@ -18,3 +18,16 @@ String urlGet(List<String> list) {
 	return endpointPrice;
 }
 
+
+// void print_intro() {
+
+// 	stdout.write('|');
+// 	print ('******************************************************\n'
+// 		'*~~~           Welcome to CoinFolio           ~~~*\n'
+// 		'*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*\n'
+// 		'*~~~         You can use these commands:           ~~~*\n'
+// 		'*~~~      SEARCH - to look for current assets value ~~~*\n'
+// 		'*~~~      LIST    - to display all portfolio          ~~~*\n'
+// 		'*~~~      EXIT   - to quit                        ~~~*\n'
+// 		'******************************************************');
+// }
