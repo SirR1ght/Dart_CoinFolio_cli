@@ -63,12 +63,16 @@ bool requestAllowed(http.Response response){
 	if (response.statusCode == 200) {
 		return true;
 	}
+	if (response.statusCode == 400) {
+		print("\u{2757} Bad request! Check your request parameters.");
+		return false;
+	}
 	if (response.statusCode == 429) {
-		print("Too many requests from your IP, back off for ${response.headers['retry-after']} seconds.");
+		print("\u{2757} Too many requests from your IP, back off for ${response.headers['retry-after']} seconds.");
 		return false;
 	} 
 	if (response.statusCode == 418) {
-		print("Your IP is banned! Weight for ${response.headers['retry-after']} seconds.");
+		print("\u{2757} Your IP is banned! Weight for ${response.headers['retry-after']} seconds.");
 		return false;
 	}
 	return false;
@@ -78,37 +82,45 @@ Future<http.Response> sendRequest(http.Response response) async {
 		return response;
 	return response;
 }
-
 List<String> symbolPrep(List<String> list) {
-	
-	if (list)
+	for (String item in list){
+		item.toUpperCase();
+		}
+	return list;
 }
 
 void searchCoin() async {
-	print("Enter \u{1FA99} coin symbol to get it's price: ");
-	String? inputText = stdin.readLineSync();
-	//convert input to uppercase
-	//add check for inapropriate input
-	//manage escape sequences
-	final response = await client.get(Uri.parse(endpointTime));
-	if (inputText != null) {
-		if (requestAllowed(response)) {
-			print(response.statusCode);
-			print('Нормально все!');
-		} else {
-		// final response = await client.get(Uri.parse(urlGet([inputText])));
-			print(response.statusCode);
+	print("Enter \u{1FA99} coin symbol to get it's price:");
+	while (true) {
+		String? inputText = stdin.readLineSync();
+		//convert input to uppercase
+		//add check for inapropriate input
+		//manage escape sequences
+		final response = await client.get(Uri.parse(endpointTime));
+		if (inputText != null) {
+			if (requestAllowed(response)) {
+				if (!(inputText.contains(RegExp(r'^[a-zA-Z]+$')))) {
+					print("\u{2757}Incorrect input! Your input should contain only letters.\nFor example BTC, ETH, DOGE, etc.");
+					continue;
+				}
+				String data = (inputText + 'BUSD').toUpperCase();
+				print (data);
+				String testUrl = urlGet([data]);
+				print("Test URL: $testUrl");
+				final response = await client.get(Uri.parse(urlGet([data])));
+				if (requestAllowed(response)) {
+					print(response.body);
+					Coin testcoin = Coin.fromJson(jsonDecode(response.body));
+					testcoin.printInfo();
+				}
+				// print(response.statusCode);
+
+				print('Нормально все!');
+			} else {
+				print(response.statusCode);
+			}
 		}
 	}
-	// if (inputText != null) {
-	// 	final response = await client.get(Uri.parse(urlGet([inputText])));
-	// 	if (response.statusCode == 200) {
-	// 		Coin testcoin = Coin.fromJson(jsonDecode(response.body));
-	// 		testcoin.printInfo();
-	// 	} else {
-	// 		print("Error: ${response.statusCode}");
-	// 	}
-	// }
 }
 
 void main(List<String> arguments) async {
