@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:coinfolio/tools.dart';
 import 'package:characters/characters.dart';
 import 'package:http/http.dart' as http;
+// import 'package:path_provider/path_provider.dart';
 
 late http.Client client = http.Client();
+late List <CoinRecord> folio = [];
 
 class Coin {
 	final String symbol;
@@ -24,7 +26,7 @@ class Coin {
 	void printInfo() => print(this.toString());
 
 	String toString() {
-		return "${this.symbol} ${this.price}";
+		return "\u{2705} ${this.symbol} Price: ${this.price}";
 	}
 
 	Future<http.Response> fetchCoin(List<String> url) async {
@@ -34,24 +36,27 @@ class Coin {
 
 class CoinRecord {
 	final Coin coin;
+	final int amount;
 	final DateTime timeStamp;
 
 	const CoinRecord({
 		required this.coin,
+		required this.amount,
 		required this.timeStamp,
 	});
 
-	factory CoinRecord.fromJson(Map<String, dynamic> json, DateTime timestamp) {
+	factory CoinRecord.fromJson(Coin coin, int amount, DateTime timestamp) {
 		return CoinRecord(
-			coin: Coin.fromJson(json),
-			timeStamp: timestamp,
+			coin: coin,
+			amount: amount,
+			timeStamp: DateTime.now(),
 		);
 	}
 
 	void printInfo() => print(this.toString());
 
 	String toString() {
-		return "${coin.symbol}, ${coin.symbol}, ${this.timeStamp}";
+		return "\u{2757} ${coin.symbol}, ${coin.symbol}, ${this.timeStamp}";
 	}
 }
 
@@ -89,6 +94,43 @@ List<String> symbolPrep(List<String> list) {
 	return list;
 }
 
+int coinAmount() {
+	print("How many coins would you like to add?");
+	while (true) {
+		String? inputText = stdin.readLineSync();
+		if (inputText != null) {
+			if (inputText.contains(RegExp(r'^[0-9]+$'))) {
+				int amount = int.parse(inputText);
+				print("\u{2705} $amount will be added to your folio.");
+				return amount;
+			}
+			print("\u{2757} Unknown command! Please enter amount of coins you would like to add.");
+		}
+	}
+}
+
+void addCoin(Coin coin) {
+	print("Would you like to add a $coin to your folio? (Y/N)");
+	while (true) {
+		String? inputText = stdin.readLineSync();
+		if (inputText != null) {
+			if (inputText == "Y" || inputText == "y" || inputText == "YES" || inputText == "yes") {
+				//ask how many coins would you like to add
+				int amount = coinAmount();
+				CoinRecord record = CoinRecord.fromJson(coin, amount, DateTime.now());
+				folio.add(record);
+				print("\u{2705} $amount coins of ${coin.symbol} were added to your folio.");
+				break;
+			}
+			if (inputText == "N" || inputText == "n" || inputText == "NO" || inputText == "no") {
+				print("$coin wasn't added to your folio.");
+				break;
+			}
+			print("\u{2757} Unknown command! Please enter YES/NO.");
+		}
+	}
+}
+
 void searchCoin() async {
 	print("Enter \u{1FA99} coin symbol to get it's price:");
 	while (true) {
@@ -110,15 +152,15 @@ void searchCoin() async {
 				final response = await client.get(Uri.parse(urlGet([data])));
 				if (requestAllowed(response)) {
 					print(response.body);
-					Coin testcoin = Coin.fromJson(jsonDecode(response.body));
-					testcoin.printInfo();
+					Coin coin = Coin.fromJson(jsonDecode(response.body));
+					coin.printInfo();
+					addCoin(coin);
 				}
-				// print(response.statusCode);
-
-				print('Нормально все!');
-			} else {
-				print(response.statusCode);
+				//
+				//add smiles to printout
+				//write add function that adds coin to the the folio
 			}
+
 		}
 	}
 }
