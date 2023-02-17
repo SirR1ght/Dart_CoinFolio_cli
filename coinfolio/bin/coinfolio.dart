@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 // import 'package:path_provider/path_provider.dart';
 
 late http.Client client = http.Client();
-late List <CoinRecord> folio = [];
+List <CoinRecord> folio = [];
 
 class Coin {
 	final String symbol;
@@ -23,10 +23,11 @@ class Coin {
 			price: json['price'],
 		);
 	}
-	void printInfo() => print(this.toString());
+	void printInfo() => print(toString());
 
+	@override
 	String toString() {
-		return "\u{2705} ${this.symbol} Price: ${this.price}";
+		return "\u{2705} $symbol Price: $price";
 	}
 
 	Future<http.Response> fetchCoin(List<String> url) async {
@@ -53,10 +54,11 @@ class CoinRecord {
 		);
 	}
 
-	void printInfo() => print(this.toString());
+	void printInfo() => print(toString());
 
+	@override
 	String toString() {
-		return "\u{2757} ${coin.symbol}, ${coin.symbol}, ${this.timeStamp}";
+		return "\u{2757} ${coin.symbol}, ${coin.symbol}, $timeStamp";
 	}
 }
 
@@ -83,8 +85,9 @@ bool requestAllowed(http.Response response){
 	return false;
 }
 Future<http.Response> sendRequest(http.Response response) async {
-	if (!requestAllowed(response))
+	if (!requestAllowed(response)) {
 		return response;
+	}
 	return response;
 }
 List<String> symbolPrep(List<String> list) {
@@ -145,7 +148,7 @@ void searchCoin() async {
 					print("\u{2757}Incorrect input! Your input should contain only letters.\nFor example BTC, ETH, DOGE, etc.");
 					continue;
 				}
-				String data = (inputText + 'BUSD').toUpperCase();
+				String data = inputText + 'BUSD'.toUpperCase();
 				print (data);
 				String testUrl = urlGet([data]);
 				print("Test URL: $testUrl");
@@ -155,15 +158,24 @@ void searchCoin() async {
 					Coin coin = Coin.fromJson(jsonDecode(response.body));
 					coin.printInfo();
 					addCoin(coin);
+					break;
 				}
 				//
 				//add smiles to printout
-				//write add function that adds coin to the the folio
+				//! write add function that adds coin to the the folio
 			}
 
 		}
 	}
 }
+void listCoins() {
+	print("Your folio:");
+	for (CoinRecord record in folio) {
+		record.printInfo();
+	}
+}
+
+enum Menu {search, list, exit}
 
 void main(List<String> arguments) async {
 
@@ -172,16 +184,33 @@ void main(List<String> arguments) async {
 	// response.headers.forEach((key, value) => print('$key: $value'));
 
 	print_intro();
-	while (true) {
+	bool loop = true;
+	while (loop) {
 		String? inputText = stdin.readLineSync();
 		if (inputText != null) {
-			if (inputText == "EXIT" || inputText == "exit") {
+			inputText = inputText.toUpperCase();
+			// switch (inputText) {
+			// 	case "EXIT":
+			// 		client.close();
+			// 		loop = false;
+			// 		break;
+			// 	case "SEARCH":
+			// 		searchCoin();
+			// 		break;
+			// 	case "LIST":
+			// 		listCoins();
+			// 		break;
+			// 	default:
+			// 		getLine('\u{1F9D0} Unknown command! Please try again.', false);
+			if (inputText == "EXIT") {
 				client.close();
+				loop = false;
 				break;
-			} else if (inputText == "SEARCH" || inputText == "search") {
+			} else if (inputText == "SEARCH") {
 				searchCoin();
 				break;
-			} else if (inputText == "LIST" || inputText == "list") {
+			} else if (inputText == "LIST") {
+				listCoins();
 				break;
 			} else {
 				getLine('\u{1F9D0} Unknown command! Please try again.', false);

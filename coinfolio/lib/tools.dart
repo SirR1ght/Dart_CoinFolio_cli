@@ -5,12 +5,12 @@ const endpoint24hr = "https://api.binance.com/api/v3/ticker/24hr";
 const endpointTime = "https://api.binance.com/api/v3/time";
 
 const int column_width = 60;
-final topBottom = '*' * (column_width);
-final midle = lineStart + '~' * freeSpace + lineEnd;
 const lineStart = '*~~~';
 const lineEnd = '~~~*';
 const usedSpace = lineStart.length + lineEnd.length;
 const freeSpace = column_width - usedSpace;
+final topBottom = '*' * (column_width);
+final midle = lineStart + '~' * freeSpace + lineEnd;
 
 String urlGet(List<String> list) {
 	if (list.length == 1) {
@@ -32,9 +32,10 @@ void getLine(String text, bool command) {
 	final int spaceBetween = (freeSpace - text.length) ~/ 2;
 	if (!command) { // To make lines look even to each other
 		//To make text even
-		if (text.length % 2 != 0) {
-		text += ' ';
-		}
+		text = text.length.isEven ? text : text += ' ';
+		// if (text.length % 2 != 0) {
+		// text += ' ';
+		// }
 		//Combines whole line
 		String output = '$lineStart${' ' * spaceBetween}$text${' ' * spaceBetween}$lineEnd';
 		return print(output);
